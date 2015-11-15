@@ -1,0 +1,14 @@
+{
+  "name": "scrapeproject",
+  "version": "1.0.0",
+  "description": "scraping for sccs",
+  "main": "flattener.js",
+  "scripts": {
+    "test": "node flattener.js"
+  },
+  "author": "Adel Lahlou",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.2.5"
+  }
+}
