@@ -1,4 +1,3 @@
-//npm modules
 var fs = require('fs');
 var mongoose = require('mongoose');
 var connection = mongoose.connect('mongodb://root:Eight123@ds053784.mongolab.com:53784/sccs_scrapeproject');
@@ -25,11 +24,12 @@ var ProcessedSchema = new Schema({
 	dataType: String, 
 	content : String, 
 	time: Date, 
-	contentid: String, 
+	contentid: String,
+	references: String, 
 	userid: String
 });
 
-var ProcessedModel =  mongoose.model('Scrapie', ProcessedSchema);
+var ProcessedModel =  mongoose.model('mScrapie', ProcessedSchema);
 
 dataKeys.forEach(function(key){
 	data[key].forEach(function(tuple){
@@ -55,9 +55,10 @@ function extractPost(post, save){
 		content = post.message, 
 		time = post.created_time, 
 		contentid = post.id,
+		references = "",
 		userid = post.from.id;
 
-	var dtuple = dataTuple(dataType, content, time, contentid, userid);
+	var dtuple = dataTuple(dataType, content, time, contentid, references, userid);
 	save(dtuple);
 
 	var comments = post.comments;
@@ -65,28 +66,30 @@ function extractPost(post, save){
 	if(comments){
 		comments = comments.data;
 		comments.forEach(function(comment){
-			extractComment(comment, save);
+			extractComment(comment, contentid, save);
 		});
 	}
 }
 
-function extractComment(comment, save){
+function extractComment(comment, postid, save){
 	var dataType = 'comment', 
 		content = comment.message, 
 		time = comment.created_time, 
 		contentid = comment.id,
+		references = postid,
 		userid = comment.from.id;
 
-	save(dataTuple(dataType, content, time, contentid, userid));
+	save(dataTuple(dataType, content, time, contentid, references, userid));
 }
 
 
-function dataTuple(dataType, content, time, contentid, userid){
+function dataTuple(dataType, content, time, contentid, references, userid){
 	return {
 		dataType: dataType, 
 		content : content, 
 		time: time, 
 		contentid: contentid, 
+		references : references,
 		userid: userid
 	};
 }
