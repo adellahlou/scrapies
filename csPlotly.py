@@ -5,52 +5,60 @@ from pymongo import MongoClient
 import json
 
 client = MongoClient('mongodb://root:Eight123@ds053784.mongolab.com:53784/sccs_scrapeproject')
-db = client.scrapies
+db = client.sccs_scrapeproject
 scrapies = db.scrapies
 
 #db.scrapies.find({"time" : { $gte : new ISODate("2010-09-18T20:33:31.000Z") }});
 dbCursor = scrapies.find()
-print(dbCursor)
 
-postTimes = []
-commentTimes = []
+#Function for clearly printing a dictionary's values
+def dictPrint(dictIn):
+	for attribute, value in dictIn.items():
+		print('{} : {}'.format(attribute, value))
+	print('\n')
 
+# A function for binning the times of each posts
+# Not necessary, since plotly autobins for us.
 def timeBinning(cursor):
 	count = 0;
 	for row in cursor:
-		count = count + 1
-		if(count < 10):
-			print row
-		else:
-			break
+		timeHour = row['time'].hour
+		times.append(timeHour)
+		#hourBins[timeHour] += 1
 
-
+times = []
+#hourBins = dict.fromkeys(range(0, 24), 0)
 timeBinning(dbCursor)
 
-# def getData(filename):
-# 	with open(filename) as json_data:    
-# 		data = json.load(json_data)
-# 		nodes = data["nodes"];
-
-# 		for obj in nodes:
-# 			if(obj["dataType"] == 'post'):
-# 				postTimes.append(obj["time"])
-
-# 			if(obj["dataType"] == 'comment'):
-# 				commentTimes.append(obj["time"])
-
-
-# getData('test.txt');
-
-#print(postTimes)
-#print(commentTimes)
 
 data = [
 
-	go.Scatter(
-		x = postTimes, 	#x=['2014-8-04 22:23:00', '2014-12-04 22:23:00', '2015-6-04 22:23:00'],
-	    y = postTimes
+	go.Histogram(
+		x = times,
+		marker=dict(
+	        color='fuchsia',
+	        line=dict(
+	            color='grey',
+	            width=0
+	        )
+	    ),
+	    opacity=0.75
 	)
 ]
 
-plot_url = py.plot(data, filename='date-axes')
+layout = go.Layout(
+    title='CS Facebook Group Post Hours',
+    xaxis=dict(
+        title='Hour'
+    ),
+    yaxis=dict(
+        title='# of Posts'
+    ),
+    barmode='overlay',
+    bargap=0.25,
+    bargroupgap=0.3
+)
+
+fig = go.Figure(data=data, layout=layout)
+
+plot_url = py.plot(fig, filename='time-histogram')
