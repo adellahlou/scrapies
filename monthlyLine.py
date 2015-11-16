@@ -54,7 +54,7 @@ data = [
 ]
 
 layout = go.Layout(
-    title='CS Facebook Group Posts Yearly',
+    title='CS Facebook Group Posts Monthly',
     xaxis=dict(
         title='Month'
     ),
@@ -68,4 +68,4 @@ layout = go.Layout(
 
 fig = go.Figure(data=data, layout=layout)
 
-#plot_url = py.plot(fig, filename='time-line')
+plot_url = py.plot(fig, filename='time-line')
