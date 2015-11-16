@@ -18,13 +18,12 @@ def dictPrint(dictIn):
 	print('\n')
 
 # A function for binning the times of each posts
-# Not necessary, since plotly autobins for us.
 def timeBinning(cursor):
 	count = 0;
 	for row in cursor:
 		timeHour = row['time'].hour
 		times.append(timeHour)
-		#hourBins[timeHour] += 1
+		
 
 times = []
 #hourBins = dict.fromkeys(range(0, 24), 0)

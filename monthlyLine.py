@@ -11,16 +11,39 @@ scrapies = db.scrapies
 #db.scrapies.find({"time" : { $gte : new ISODate("2010-09-18T20:33:31.000Z") }});
 dbCursor = scrapies.find()
 
+#Function for clearly printing a dictionary's values
+def dictPrint(dictIn):
+	for attribute, value in dictIn.items():
+		print('{} : {}'.format(attribute, value))
+	print('\n')
 
+def getVals(dictIn):
+	vals = []
+	for attribute, value in dictIn.items():
+		vals.append(value)
+	print(sum(vals))
+	return vals
 
+# A function for binning the times of each posts
+def monthBinning(cursor):
+	for row in cursor:
+		rowMonth = row['time'].month
+		monthBins[rowMonth] += 1
+	dictPrint(monthBins)
+
+monthBins = dict.fromkeys(range(1, 13), 0)
+timeMonths = []
+allMonths = range(1,12)
+monthBinning(dbCursor)
 
 
 data = [
 
-	go.Histogram(
-		x = times,
+	go.Scatter(
+		x = allMonths,
+		y = getVals(monthBins),
 		marker=dict(
-	        color='fuchsia',
+	        color='blue',
 	        line=dict(
 	            color='grey',
 	            width=0
@@ -31,9 +54,9 @@ data = [
 ]
 
 layout = go.Layout(
-    title='CS Facebook Group Post Hours',
+    title='CS Facebook Group Posts Yearly',
     xaxis=dict(
-        title='Hour'
+        title='Month'
     ),
     yaxis=dict(
         title='# of Posts'
@@ -45,4 +68,4 @@ layout = go.Layout(
 
 fig = go.Figure(data=data, layout=layout)
 
-plot_url = py.plot(fig, filename='time-histogram')
+#plot_url = py.plot(fig, filename='time-line')
