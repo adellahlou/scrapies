@@ -4,70 +4,73 @@ from datetime import datetime
 from pymongo import MongoClient
 import json
 import pickle
-
-client = MongoClient('mongodb://root:Eight123@ds053784.mongolab.com:53784/sccs_scrapeproject')
-db = client.sccs_scrapeproject
-scrapies = db.mscrapies
-
-#Function for clearly printing a dictionary's values
-def dictPrint(dictIn):
-	for attribute, value in dictIn.items():
-
-		try:
-			print('{} : {}'.format(attribute, value))
-		except Exception as e:
-			continue
-
-	print('\n')
+from scipy import stats
 
 
-def getVals(dictIn):
-	vals = []
-	for attribute, value in dictIn.items():
-		vals.append(value)
-	print(sum(vals))
-	return vals
+
+# client = MongoClient('mongodb://root:Eight123@ds053784.mongolab.com:53784/sccs_scrapeproject')
+# db = client.sccs_scrapeproject
+# scrapies = db.mscrapies
+
+# #Function for clearly printing a dictionary's values
+# def dictPrint(dictIn):
+# 	for attribute, value in dictIn.items():
+
+# 		try:
+# 			print('{} : {}'.format(attribute, value))
+# 		except Exception as e:
+# 			continue
+
+# 	print('\n')
+
+
+# def getVals(dictIn):
+# 	vals = []
+# 	for attribute, value in dictIn.items():
+# 		vals.append(value)
+# 	print(sum(vals))
+# 	return vals
 
 	
 
-def timeToFirstComment():
-	postCursor = scrapies.find({'dataType' : 'post'})
-	ret = []
-	nocomments = 0
+# def timeToFirstComment():
+# 	postCursor = scrapies.find({'dataType' : 'post'})
+# 	ret = []
+# 	nocomments = 0
 
-	for post in postCursor:
-		# print post
-		postid = post['contentid']
-		commentCursor = scrapies.find({'references' : postid })
+# 	for post in postCursor:
+# 		# print post
+# 		postid = post['contentid']
+# 		commentCursor = scrapies.find({'references' : postid })
 
-		if commentCursor.count() == 0:
-			nocomments += 1
-			continue
+# 		if commentCursor.count() == 0:
+# 			nocomments += 1
+# 			continue
 
-		quickest = commentCursor[0]
-		posttime = post['time']
+# 		quickest = commentCursor[0]
+# 		posttime = post['time']
 
-		for comment in commentCursor:
-			if quickest['time'] > comment['time']:
-				quickest = comment 
+# 		for comment in commentCursor:
+# 			if quickest['time'] > comment['time']:
+# 				quickest = comment 
 
-		delta = quickest['time'] - posttime
-		print delta
-		ret.append(delta)
+# 		delta = quickest['time'] - posttime
+# 		print delta
+# 		ret.append(delta)
 
-	return ret
+# 	return ret
 
-deltas = timeToFirstComment()
-average = deltas[0]
-for delta in deltas:
-	average += delta
-average -= deltas[0]
-print average
-print len(deltas)
-average = average / len(deltas)
-print average
+# deltas = timeToFirstComment()
+# average = deltas[0]
+# for delta in deltas:
+# 	average += delta
+# average -= deltas[0]
+# print average
+# print len(deltas)
+# average = average / len(deltas)
+# print average
 
-pickle.dump(deltas, open("timeToFirstResponse.pickle", "wb"))
+# pickle.dump(deltas, open("timeToFirstResponse.pickle", "wb"))
 
 # monthBins = dict.fromkeys(range(1, 13), 0)
 # timeMonths = []
@@ -76,6 +79,27 @@ pickle.dump(deltas, open("timeToFirstResponse.pickle", "wb"))
 # monthlyWordFavorites = getMaxesMonth(monthlyWordBin)
 
 
+def describeResults():
+	deltas = pickle.load(open('timeToFirstResponse.pickle', 'rb'))
+	changed = [delta.total_seconds() for delta in deltas ]
+	top = []
+	cutoff = changed[0]
+	for change in changed:
+		if len(top) < 100:
+			top.append(change)
+			cutoff = change if change < cutoff else cutoff
+		else:
+			if change > cutoff:
+				top.remove(cutoff)
+				top.append(change)
+				cutoff = change
+
+	description = stats.describe(changed)
+	description2 = stats.describe(top)
+	print description
+	print description2
+
+describeResults()
 # data = [
 
 # 	go.Scatter(
