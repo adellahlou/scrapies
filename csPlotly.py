@@ -9,26 +9,38 @@ db = client.scrapies
 scrapies = db.scrapies
 
 #db.scrapies.find({"time" : { $gte : new ISODate("2010-09-18T20:33:31.000Z") }});
-test = scrapies.find()
-print(test)
+dbCursor = scrapies.find()
+print(dbCursor)
 
 postTimes = []
 commentTimes = []
 
-def getData(filename):
-	with open(filename) as json_data:    
-		data = json.load(json_data)
-		nodes = data["nodes"];
-
-		for obj in nodes:
-			if(obj["dataType"] == 'post'):
-				postTimes.append(obj["time"])
-
-			if(obj["dataType"] == 'comment'):
-				commentTimes.append(obj["time"])
+def timeBinning(cursor):
+	count = 0;
+	for row in cursor:
+		count = count + 1
+		if(count < 10):
+			print row
+		else:
+			break
 
 
-getData('test.txt');
+timeBinning(dbCursor)
+
+# def getData(filename):
+# 	with open(filename) as json_data:    
+# 		data = json.load(json_data)
+# 		nodes = data["nodes"];
+
+# 		for obj in nodes:
+# 			if(obj["dataType"] == 'post'):
+# 				postTimes.append(obj["time"])
+
+# 			if(obj["dataType"] == 'comment'):
+# 				commentTimes.append(obj["time"])
+
+
+# getData('test.txt');
 
 #print(postTimes)
 #print(commentTimes)
